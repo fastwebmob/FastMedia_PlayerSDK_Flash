@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+	<head>
+		<title>FastMediaPlayerSDKDemo</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<style>
+		html, body { background-color: #ffffff;margin:0 auto; padding:0;width: 1200px;height: 700px;}
+		#fcontent { float: left;margin: -20px 0;}
+		#url_list { float: left; width: 240px;}
+		#url_list ul li { overflow: hidden;text-overflow: ellipsis;white-space: nowrap; }
+		#url_list ul li a:link,#url_list ul li a:visited { color: #aaa; }
+		#url_list ul li a:hover,#url_list ul li a:active { color: #1cb234; }
+		form { float: left; }
+		form div,input { display: block; width: 300px;}
+
+
+		</style>
+		<script type="text/javascript" src="swfobject.js" ></script>
+	</head>
+	<body>
+		<div id="fcontent" style="margin: 5px;padding-top: 0px;">
+		</div>
+ 
+		<div id="url_list" style="">
+			<ul>
+                <li><a name="http://httpflv.fastweb.com.cn.cloudcdn.net/live_fw/stream">Fastweb Test Stream</a></li>
+				<li><a name="rtmp://live.hkstv.hk.lxdns.com/live/hks">RTMP测试流</a></li>
+				<li><a name="http://fms.cntv.lxdns.com/live/flv/channel89.flv">其它FLV测试流</a></li>
+				<li><a name="http://302.myxns.net/">302跳转测试</li>
+		</ul>
+		</div>
+
+		<form style="margin-top: 30px;margin-left: 40px;" id="configForm">
+			<div>请输入URL：<input name="url_txt"></input></div>
+			<div>缓存时间(ms)：<input name="cacheTime_txt"></input></div>
+			<div>连接超时时间(ms)：<input name="timeOutT_txt"></input></div>
+			<div>重连次数(次)：<input name="recountTimes_txt"></input></div>
+			<div>最大卡顿时间(ms)：<input name="maxStuckTime_txt"></input></div>
+			<div>最大播起时间(ms)：<input name="waitingTime_txt"></input></div>
+			<div>声音设置(0~1)：<input name="volumn_txt"></input></div>
+			<div>宽缩放比例(0~1)：<input name="w_scale_txt"></input></div>
+			<div>高缩放比例(0~1)：<input name="h_scale_txt"></input></div>
+			<div style="display: inline-block;width: 80px;margin-left: 10px; margin-top: 15px;"><input type="button" value="播放" id="submit" style="width: 80px;display: inline-block;"></input></div>
+			<div style="display: inline-block;width: 80px;margin-left: 10px;margin-top: 15px;"><input type="button" value="停止" id="stop" style="width: 80px;display: inline-block;"></input></div>
+            <div style="display: inline-block;width: 80px;margin-left: 10px;margin-top: 15px;"><input type="button" value="静音" id="mute" style="width: 80px;display: inline-block;"></input></div>
+            <div style="display: inline-block;width: 80px;margin-left: 10px;margin-top: 15px;"><input type="button" value="取消静音" id="unmute" style="width: 80px;display: inline-block;"></input></div>
+			
+		</form>
+		
+
+
+
+		<script type="text/javascript">
+
+			var so=new SWFObject("FastMediaPlayerSDK.swf","flash","640","480","9");
+			so.addParam("allowFullScreen","true");
+			so.addParam("wmode","window");    //   必须为window
+            //so.addParam("flashvars","hideControllerbar=1");    //隐藏控制条   
+			so.write("fcontent");
+
+
+			window.onload = function(){
+				var inputs= document.getElementById("configForm").getElementsByTagName("input");
+
+				inputs[0].value = "";
+				inputs[1].value = 1000;
+				inputs[2].value = 5000;
+				inputs[3].value = 3;
+				inputs[4].value = 20000;
+				inputs[5].value = 10000;
+				inputs[6].value = 0.67;
+				inputs[7].value = 1;
+				inputs[8].value = 1;
+
+				
+				var flash = document.getElementById("flash");
+
+				document.getElementById("submit").onclick = function(){
+
+                    var url = inputs[0].value;
+                    var cacheTime = inputs[1].value;
+                    var timeOutT = inputs[2].value;
+                    var recountTimes = inputs[3].value;
+                    var maxStuckTime = inputs[4].value;
+                    var waitingTime = inputs[5].value;
+                    var volume = inputs[6].value;
+                    var w_scale = inputs[7].value;
+                    var h_scale = inputs[8].value;
+
+                    //    设置部分
+                    flash.setPlayerUrl(url);
+                    flash.setPlayerViewScale(w_scale,h_scale);
+                    flash.setMediaCacheTime(cacheTime);
+//                    flash.setPlayerVolume(volume);
+                    flash.setConnectTimeout(timeOutT);
+                    flash.setReconnectTimes(recountTimes);
+                    flash.setMaxStuckTime(maxStuckTime);
+                    flash.setFirstMaxPlayTime(waitingTime);
+                    flash.playVideo();
+			    }
+
+
+                document.getElementById("stop").onclick = function(){
+                    flash.stop();
+                }
+                
+                document.getElementById("mute").onclick = function(){
+				    flash.mute();
+				    console.log("mute");
+			     }
+
+				document.getElementById("unmute").onclick = function(){
+				    flash.unmute();
+				    console.log("unmute");
+			     }
+
+			    document.getElementById("url_list").addEventListener("click",function(e) {
+		  			if(e.target.name) {
+		  				inputs[0].value =  e.target.name;
+		  			}
+	  			});
+		}
+            
+
+  			
+  			//    其它获得统计信息api
+  			/*
+            flash.getDroppedFrames();
+  			flash.getFplayTime();
+  			flash.getFTCPpackageT();
+  			flash.getStuckTimes();
+  			flash.getStuckDurationTotal();
+  			flash.getCurrentPlayTime();
+  			flash.getCurrentFPS();
+  			flash.getBufferLength();
+  			flash.getRealTimeRate();
+  			flash.getRecountInfo();
+  			flash.getTimeoutInfo();
+            
+
+  			
+  			flash.onMetaData();
+  			flash.onPlayStatus();
+  			flash.onNcStatus();
+  			flash.onNsStatus();
+  			
+            */
+
+		</script>
+	</body>
+</html>
